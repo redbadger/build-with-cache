@@ -5,9 +5,13 @@ import (
 	"os/exec"
 )
 
-// Root is the execution of the root command
-func Root(dir, file string) (out []byte, err error) {
-	build := exec.Command("docker", "build", dir, "-f", file)
+func build(dir, file, tag string) (out []byte, err error) {
+	args := []string{"build", dir, "-f", file}
+	if tag != "" {
+		args = append(args, "-t", tag)
+	}
+
+	build := exec.Command("docker", args...)
 	if dir == "-" {
 		build.Stdin = os.Stdin
 	}
