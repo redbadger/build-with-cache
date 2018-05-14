@@ -6,8 +6,9 @@ The tool parses the `Dockerfile` for the stage targets and attempts to pull resp
 
 Steps:
 
-1.  Parse `Dockerfile` looking for (currently only) named stages.
+1.  Parse `Dockerfile` looking for stages.
 1.  Attempts to pull an image for each stage.
+    1.  Image name is that supplied by `--tag` appended with stage name or number: e.g. my-registry/my-image-builder or my-registry/my-image-0
 1.  For every image found, pass a `--cache-from` directive to the build.
 1.  Tag the images created for each stage.
 1.  Push these images back to the registry.

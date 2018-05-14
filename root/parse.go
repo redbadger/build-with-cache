@@ -1,7 +1,9 @@
 package root
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/docker/docker/builder/dockerfile/instructions"
 	"github.com/docker/docker/builder/dockerfile/parser"
@@ -19,8 +21,15 @@ func Parse(fileName string) (targets []string, err error) {
 		return
 	}
 
+	stage := 0
 	for _, x := range stages {
-		targets = append(targets, x.Name)
+		fmt.Printf("%+v", x)
+		name := x.Name
+		if name == "" {
+			name = strconv.Itoa(stage)
+		}
+		targets = append(targets, name)
+		stage++
 	}
 	return
 }
