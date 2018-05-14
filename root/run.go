@@ -2,6 +2,8 @@ package root
 
 import (
 	"fmt"
+
+	"github.com/docker/distribution/reference"
 )
 
 // Run the root command
@@ -12,9 +14,14 @@ func Run(context, file, tag string) (err error) {
 		if err != nil {
 			return
 		}
+		var ref reference.Named
 		for _, stage := range stages {
-			img := fmt.Sprintf("%s-%s", tag, stage)
-			fmt.Println(img)
+			ref, err = reference.ParseNamed(tag)
+			if err != nil {
+				return
+			}
+			img := fmt.Sprintf("%s-%s", reference.TrimNamed(ref), stage)
+			fmt.Printf("Pulling: %s\n", img)
 			pull(img)
 		}
 	}
