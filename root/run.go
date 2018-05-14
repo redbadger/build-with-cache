@@ -2,9 +2,17 @@ package root
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/docker/distribution/reference"
+	"github.com/docker/docker/pkg/jsonmessage"
+	"github.com/docker/docker/pkg/term"
 )
+
+func streamDockerMessages(dst io.Writer, src io.Reader) error {
+	fd, _ := term.GetFdInfo(dst)
+	return jsonmessage.DisplayJSONMessagesStream(src, dst, fd, false, nil)
+}
 
 // Run the root command
 func Run(context, file, tag string) (err error) {

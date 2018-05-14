@@ -3,9 +3,30 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "9NFR6RG8H2fNyKHscGmuGLQhRm4=",
+			"origin": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm",
+			"path": "github.com/Azure/go-ansiterm",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
+			"checksumSHA1": "3/UphB+6Hbx5otA4PjFjvObT+L4=",
+			"origin": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm/winterm",
+			"path": "github.com/Azure/go-ansiterm/winterm",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
 			"checksumSHA1": "3XbNrez8J6XznoZZ8eRJEg+fPTE=",
 			"origin": "github.com/docker/docker/vendor/github.com/Microsoft/go-winio",
 			"path": "github.com/Microsoft/go-winio",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
+			"checksumSHA1": "JkTTSwt87QlBH+fnEx/Bu23j3LI=",
+			"origin": "github.com/docker/docker/vendor/github.com/Nvveen/Gotty",
+			"path": "github.com/Nvveen/Gotty",
 			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
 			"revisionTime": "2018-05-14T13:37:33Z"
 		},
@@ -151,6 +172,12 @@
 			"revisionTime": "2018-05-14T13:37:33Z"
 		},
 		{
+			"checksumSHA1": "or3aL5DlcUW38pazQAydN6ZD6Jo=",
+			"path": "github.com/docker/docker/pkg/jsonmessage",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
 			"checksumSHA1": "IaLUlgL27e2W5LVWvncHgPWKffg=",
 			"path": "github.com/docker/docker/pkg/mount",
 			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
@@ -159,6 +186,18 @@
 		{
 			"checksumSHA1": "E6YGk+mLX+kID6fxKWNN6gbH6eg=",
 			"path": "github.com/docker/docker/pkg/system",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
+			"checksumSHA1": "WjvsjU1rtFjD3S0MmzKi5M08zjc=",
+			"path": "github.com/docker/docker/pkg/term",
+			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
+			"revisionTime": "2018-05-14T13:37:33Z"
+		},
+		{
+			"checksumSHA1": "RbKd6O8P1UnaoxbdmV6eukac69M=",
+			"path": "github.com/docker/docker/pkg/term/windows",
 			"revision": "a79d04ae55196f73d67eeb8a40cfbeb67fed95e9",
 			"revisionTime": "2018-05-14T13:37:33Z"
 		},
