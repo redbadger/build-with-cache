@@ -49,4 +49,4 @@ The main difference is that the `--tag` flag must be specified if you want cachi
     govendor sync
     ```
 
-1.  Then build and run as normal (e.g. `go build` or `go run main.go`)
+1.  Build everything in your repository only: `govendor install +local` or test your repository only: `govendor test +local`
