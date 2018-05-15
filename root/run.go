@@ -47,7 +47,7 @@ func Run(contextDir, file, imgTag string) (err error) {
 		}
 	}
 
-	out, err := build(contextDir, file, imgTag)
+	out, err := build(contextDir, file, imgTag, images)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return

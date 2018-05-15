@@ -9,11 +9,14 @@ import (
 	"os/exec"
 )
 
-func build(dir, file, tag string) (out string, err error) {
+func build(dir, file, tag string, images map[string]string) (out string, err error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
 	args := []string{"build", dir, "-f", file}
 	if tag != "" {
 		args = append(args, "-t", tag)
+	}
+	for _, image := range images {
+		args = append(args, "--cache-from", image)
 	}
 
 	cmd := exec.Command("docker", args...)
