@@ -13,8 +13,8 @@ import (
 
 func push(ctx context.Context, cli *client.Client, ref string) (err error) {
 	authConfig := types.AuthConfig{
-		Username: "",
-		Password: "",
+		Username: "admin",
+		Password: "admin123",
 	}
 	encodedJSON, err := json.Marshal(authConfig)
 	if err != nil {
