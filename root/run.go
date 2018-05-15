@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 
+	"golang.org/x/crypto/ssh/terminal"
+
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
@@ -14,7 +16,8 @@ import (
 
 func streamDockerMessages(dst io.Writer, src io.Reader) error {
 	fd, _ := term.GetFdInfo(dst)
-	return jsonmessage.DisplayJSONMessagesStream(src, dst, fd, false, nil)
+	isTerminal := terminal.IsTerminal(int(fd))
+	return jsonmessage.DisplayJSONMessagesStream(src, dst, fd, isTerminal, nil)
 }
 
 // Run the root command
