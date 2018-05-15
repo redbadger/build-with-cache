@@ -20,21 +20,21 @@ func streamDockerMessages(dst io.Writer, src io.Reader) error {
 }
 
 // Run the root command
-func Run(contextDir, file, tag string) (err error) {
+func Run(contextDir, file, imgTag string) (err error) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return
 	}
 	var stages []string
-	if tag != "" {
+	if imgTag != "" {
 		stages, err = parse(file)
 		if err != nil {
 			return
 		}
 		var ref reference.Named
 		for _, stage := range stages {
-			ref, err = reference.ParseNamed(tag)
+			ref, err = reference.ParseNamed(imgTag)
 			if err != nil {
 				return
 			}
@@ -46,11 +46,27 @@ func Run(contextDir, file, tag string) (err error) {
 			}
 		}
 	}
-	out, err := build(contextDir, file, tag)
-	fmt.Printf("%s\n", out)
+	out, err := build(contextDir, file, imgTag)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return
+	}
+	var names map[string]string
+	if imgTag != "" {
+		names, err = parseStageSHA(out, imgTag, stages)
+		if err != nil {
+			return
+		}
+		for sha, name := range names {
+			err = tag(ctx, cli, sha, name)
+			if err != nil {
+				return
+			}
+			err = push(ctx, cli, name)
+			if err != nil {
+				return
+			}
+		}
 	}
 
 	return
