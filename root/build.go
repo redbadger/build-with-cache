@@ -10,9 +10,9 @@ import (
 	"github.com/docker/docker/pkg/progress"
 	"github.com/docker/docker/pkg/streamformatter"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
-// buildOptions contains options for build
 type buildOptions struct {
 	ImageName   string
 	Dockerfile  string
@@ -22,8 +22,9 @@ type buildOptions struct {
 	BuildArgs   map[string]*string
 }
 
-// RunBuild performs a docker build and returns nothing
 func build(ctx context.Context, cli client.Client, opts *buildOptions) error {
+	logrus.Debugf("Running docker build: context: %s, dockerfile: %s", opts.ContextDir, opts.Dockerfile)
+
 	imageBuildOpts := types.ImageBuildOptions{
 		Tags:       []string{opts.ImageName},
 		Dockerfile: opts.Dockerfile,

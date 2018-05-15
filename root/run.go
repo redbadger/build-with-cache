@@ -44,14 +44,16 @@ func Run(contextDir, file, tag string) (err error) {
 			}
 		}
 	}
+	// proxy := "http://host.docker.internal:3128"
 	err = build(ctx, *cli, &buildOptions{
 		ImageName:   tag,
 		Dockerfile:  file,
 		ContextDir:  contextDir,
 		ProgressBuf: os.Stdout,
 		BuildBuf:    os.Stdout,
-		BuildArgs: map[string]*string{
-			"": nil,
+		BuildArgs:   map[string]*string{
+			// "http_proxy":  &proxy,
+			// "https_proxy": &proxy,
 		},
 	})
 	if err != nil {
