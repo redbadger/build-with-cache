@@ -1,53 +1,50 @@
 package root
 
 import (
-	"context"
+	"bytes"
+	"errors"
 	"io"
-
-	"github.com/GoogleContainerTools/skaffold/pkg/skaffold/docker"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/progress"
-	"github.com/docker/docker/pkg/streamformatter"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"log"
+	"os"
+	"os/exec"
 )
 
-type buildOptions struct {
-	ImageName   string
-	Dockerfile  string
-	ContextDir  string
-	ProgressBuf io.Writer
-	BuildBuf    io.Writer
-	BuildArgs   map[string]*string
-}
-
-func build(ctx context.Context, cli client.Client, opts *buildOptions) error {
-	logrus.Debugf("Running docker build: context: %s, dockerfile: %s", opts.ContextDir, opts.Dockerfile)
-
-	imageBuildOpts := types.ImageBuildOptions{
-		Tags:       []string{opts.ImageName},
-		Dockerfile: opts.Dockerfile,
-		BuildArgs:  opts.BuildArgs,
+func build(dir, file, tag string) (out string, err error) {
+	var stdoutBuf, stderrBuf bytes.Buffer
+	args := []string{"build", dir, "-f", file}
+	if tag != "" {
+		args = append(args, "-t", tag)
 	}
 
-	buildCtx, buildCtxWriter := io.Pipe()
+	cmd := exec.Command("docker", args...)
+	stdoutIn, _ := cmd.StdoutPipe()
+	stderrIn, _ := cmd.StderrPipe()
+	if dir == "-" {
+		cmd.Stdin = os.Stdin
+	}
+	var errStdout, errStderr error
+	stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
+	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
+	err = cmd.Start()
 	go func() {
-		err := docker.CreateDockerTarContext(buildCtxWriter, opts.Dockerfile, opts.ContextDir)
-		if err != nil {
-			buildCtxWriter.CloseWithError(errors.Wrap(err, "creating docker context"))
-			return
-		}
-		buildCtxWriter.Close()
+		_, errStdout = io.Copy(stdout, stdoutIn)
 	}()
 
-	progressOutput := streamformatter.NewProgressOutput(opts.ProgressBuf)
-	body := progress.NewProgressReader(buildCtx, progressOutput, 0, "", "Sending build context to Docker daemon")
+	go func() {
+		_, errStderr = io.Copy(stderr, stderrIn)
+	}()
 
-	resp, err := cli.ImageBuild(ctx, body, imageBuildOpts)
+	err = cmd.Wait()
 	if err != nil {
-		return errors.Wrap(err, "docker build")
+		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
-	defer resp.Body.Close()
-	return streamDockerMessages(opts.BuildBuf, resp.Body)
+	if errStdout != nil || errStderr != nil {
+		log.Fatal("failed to capture stdout or stderr\n")
+	}
+	out = string(stdoutBuf.Bytes())
+	errStr := string(stderrBuf.Bytes())
+	if errStr != "" {
+		return out, errors.New(errStr)
+	}
+	return
 }

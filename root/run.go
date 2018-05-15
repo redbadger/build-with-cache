@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 
 	"golang.org/x/crypto/ssh/terminal"
 
@@ -47,21 +46,12 @@ func Run(contextDir, file, tag string) (err error) {
 			}
 		}
 	}
-	// proxy := "http://host.docker.internal:3128"
-	err = build(ctx, *cli, &buildOptions{
-		ImageName:   tag,
-		Dockerfile:  file,
-		ContextDir:  contextDir,
-		ProgressBuf: os.Stdout,
-		BuildBuf:    os.Stdout,
-		BuildArgs:   map[string]*string{
-			// "http_proxy":  &proxy,
-			// "https_proxy": &proxy,
-		},
-	})
+	out, err := build(contextDir, file, tag)
+	fmt.Printf("%s\n", out)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return
 	}
+
 	return
 }
