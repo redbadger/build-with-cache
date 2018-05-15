@@ -7,7 +7,7 @@ import (
 	"github.com/docker/distribution/reference"
 )
 
-func parseStageSHA(buildOutput, imgTag string, stages []string) (refs map[string]string, err error) {
+func parseBuildOutput(buildOutput, imgTag string, stages []string) (refs map[string]string, err error) {
 	var ref reference.Named
 	prev := ""
 	stageNum := 0

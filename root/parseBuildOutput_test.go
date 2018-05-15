@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_parseStageSHA(t *testing.T) {
+func Test_parseBuildOutput(t *testing.T) {
 	type args struct {
 		buildOutput string
 		imgTag      string
@@ -110,13 +110,13 @@ Successfully tagged host.docker.internal:5000/redbadger/deploy:latest
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRefs, err := parseStageSHA(tt.args.buildOutput, tt.args.imgTag, tt.args.stages)
+			gotRefs, err := parseBuildOutput(tt.args.buildOutput, tt.args.imgTag, tt.args.stages)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parseStageSHA() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("parseBuildOutput() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotRefs, tt.wantRefs) {
-				t.Errorf("parseStageSHA() = %v, want %v", gotRefs, tt.wantRefs)
+				t.Errorf("parseBuildOutput() = %v, want %v", gotRefs, tt.wantRefs)
 			}
 		})
 	}

@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
@@ -26,19 +26,19 @@ func Run(contextDir, file, imgTag string) (err error) {
 	if err != nil {
 		return
 	}
-	var stages []string
+	var (
+		stages []string
+		images map[string]string
+		reader io.Reader
+	)
 	if imgTag != "" {
-		stages, err = parse(file)
+		reader, err = os.Open(file)
 		if err != nil {
 			return
 		}
-		var ref reference.Named
+		stages, images, err = parseDockerfile(reader, imgTag)
 		for _, stage := range stages {
-			ref, err = reference.ParseNamed(imgTag)
-			if err != nil {
-				return
-			}
-			img := fmt.Sprintf("%s-%s", reference.TrimNamed(ref), stage)
+			img := images[stage]
 			fmt.Printf("Pulling: %s\n", img)
 			err = pull(ctx, cli, img)
 			if err != nil {
@@ -46,14 +46,16 @@ func Run(contextDir, file, imgTag string) (err error) {
 			}
 		}
 	}
+
 	out, err := build(contextDir, file, imgTag)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return
 	}
+
 	var names map[string]string
 	if imgTag != "" {
-		names, err = parseStageSHA(out, imgTag, stages)
+		names, err = parseBuildOutput(out, imgTag, stages)
 		if err != nil {
 			return
 		}
