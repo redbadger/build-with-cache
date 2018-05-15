@@ -9,12 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func push(ref string) (err error) {
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return
-	}
+func push(ctx context.Context, cli *client.Client, ref string) (err error) {
 	rc, err := cli.ImagePush(ctx, ref, types.ImagePushOptions{})
 	if err != nil {
 		return errors.Wrap(err, "pushing image to repository")

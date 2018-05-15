@@ -1,10 +1,13 @@
 package root
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/docker/distribution/reference"
+	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/term"
 )
@@ -15,7 +18,12 @@ func streamDockerMessages(dst io.Writer, src io.Reader) error {
 }
 
 // Run the root command
-func Run(context, file, tag string) (err error) {
+func Run(contextDir, file, tag string) (err error) {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		return
+	}
 	var stages []string
 	if tag != "" {
 		stages, err = parse(file)
@@ -30,11 +38,22 @@ func Run(context, file, tag string) (err error) {
 			}
 			img := fmt.Sprintf("%s-%s", reference.TrimNamed(ref), stage)
 			fmt.Printf("Pulling: %s\n", img)
-			pull(img)
+			err = pull(ctx, cli, img)
+			if err != nil {
+				fmt.Printf("pulling %s: %s\n", img, err)
+			}
 		}
 	}
-	out, err := build(context, file, tag)
-	fmt.Printf("%s\n", out)
+	err = build(ctx, *cli, &buildOptions{
+		ImageName:   tag,
+		Dockerfile:  file,
+		ContextDir:  contextDir,
+		ProgressBuf: os.Stdout,
+		BuildBuf:    os.Stdout,
+		BuildArgs: map[string]*string{
+			"": nil,
+		},
+	})
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return

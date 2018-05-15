@@ -9,13 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// pull an image
-func pull(ref string) (err error) {
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return
-	}
+func pull(ctx context.Context, cli *client.Client, ref string) (err error) {
 	rc, err := cli.ImagePull(ctx, ref, types.ImagePullOptions{All: true})
 	if err != nil {
 		return errors.Wrap(err, "pulling image from repository")
