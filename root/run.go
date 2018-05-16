@@ -20,7 +20,7 @@ func streamDockerMessages(dst io.Writer, src io.Reader) error {
 }
 
 // Run the root command
-func Run(contextDir, file, imgTag string) (err error) {
+func Run(contextDir, file, imgTag, flags string) (err error) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -47,7 +47,7 @@ func Run(contextDir, file, imgTag string) (err error) {
 		}
 	}
 
-	out, err := build(contextDir, file, imgTag, images)
+	out, err := build(contextDir, file, imgTag, flags, images)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return

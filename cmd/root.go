@@ -15,6 +15,7 @@ var (
 	cfgFile string
 	file    string
 	tag     string
+	flags   string
 )
 
 var rootCmd = &cobra.Command{
@@ -28,7 +29,7 @@ The tool parses the Dockerfile for the stage targets and attempts to pull respec
 	Version: constants.Version,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = root.Run(args[0], file, tag)
+		err = root.Run(args[0], file, tag, flags)
 		return
 	},
 }
@@ -47,6 +48,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.build-with-cache.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "Dockerfile", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
 	rootCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Name and optionally a tag in the ‘registry/name:tag’ format")
+	rootCmd.PersistentFlags().StringVar(&flags, "flags", "", "Additional flags (as a string) to pass to docker build")
 }
 
 func initConfig() {

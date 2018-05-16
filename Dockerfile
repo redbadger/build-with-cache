@@ -1,6 +1,7 @@
 FROM golang:alpine as builder
 
-RUN echo xx > /hello
+ARG x=hello
+RUN echo ${x} > /hello
 
 FROM alpine as release
 

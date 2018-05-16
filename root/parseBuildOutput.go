@@ -15,7 +15,6 @@ func parseBuildOutput(buildOutput, imgTag string, stages []string) (refs map[str
 
 	for _, s := range strings.Split(buildOutput, "\n") {
 		if strings.Contains(s, ": FROM ") || strings.Contains(s, "Successfully built") {
-			fmt.Println(s)
 			if strings.HasPrefix(prev, " ---> ") {
 				sha := strings.Fields(prev)[1]
 				ref, err = reference.ParseNamed(imgTag)
