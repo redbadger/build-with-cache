@@ -21,9 +21,7 @@ go get github.com/redbadger/build-with-cache
 
 ## Usage:
 
-The usage of `build-with-cache` is similar to [`docker build`](https://docs.docker.com/engine/reference/commandline/build/).
-
-The main difference is that the `--tag` flag must be specified if you want caching enabled.
+The usage of `build-with-cache` is similar to [`docker build`](https://docs.docker.com/engine/reference/commandline/build/), with the exception that the `--tag` flag must be specified if you want caching enabled and any additional flags must be passed to the build using `--flags`.
 
 ## Examples:
 
@@ -34,12 +32,13 @@ The main difference is that the `--tag` flag must be specified if you want cachi
       --tag=my-registry/my-image
     ```
 
-1.  Build with tarred context on `stdin`:
+1.  Build with tarred context on `stdin` and additional flags to pass to the build:
 
     ```bash
-    build-with-cache - \
+    tar c .| build-with-cache - \
       --tag=my-registry/my-image
-      --file=Dockerfile
+      --file=Dockerfile \
+      --flags="--build-arg http_proxy=http://localhost:3128"
     ```
 
 ## To build
