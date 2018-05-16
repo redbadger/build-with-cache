@@ -50,7 +50,7 @@ func build(dir, file, tag, flags string, images map[string]string) (out string, 
 
 	fmt.Println()
 	if errStdout != nil || errStderr != nil {
-		log.Fatal("failed to capture stdout or stderr\n")
+		log.Fatalf("failed to capture stdout (%v) or stderr (%v)\n", errStdout, errStderr)
 	}
 	out = string(stdoutBuf.Bytes())
 	errStr := string(stderrBuf.Bytes())
