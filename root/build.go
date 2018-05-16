@@ -2,7 +2,6 @@ package root
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,7 +11,8 @@ import (
 )
 
 func build(dir, file, tag, flags string, images map[string]string) (out string, err error) {
-	var stdoutBuf, stderrBuf bytes.Buffer
+	var stdoutBuf bytes.Buffer
+
 	args := []string{"build", dir, "-f", file}
 	if tag != "" {
 		args = append(args, "-t", tag)
@@ -26,36 +26,31 @@ func build(dir, file, tag, flags string, images map[string]string) (out string, 
 
 	fmt.Printf("\nCommand: docker %s\n", strings.Join(args, " "))
 	cmd := exec.Command("docker", args...)
-	stdoutIn, _ := cmd.StdoutPipe()
-	stderrIn, _ := cmd.StderrPipe()
+
+	cmd.Stderr = os.Stderr
 	if dir == "-" {
 		cmd.Stdin = os.Stdin
 	}
-	var errStdout, errStderr error
-	stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
-	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
-	err = cmd.Start()
-	go func() {
-		_, errStdout = io.Copy(stdout, stdoutIn)
-	}()
 
-	go func() {
-		_, errStderr = io.Copy(stderr, stderrIn)
-	}()
+	stdoutIn, _ := cmd.StdoutPipe()
+	stdout := io.MultiWriter(os.Stdout, &stdoutBuf)
+
+	err = cmd.Start()
+	if err != nil {
+		log.Fatalf("failed to start cmd (%v)", err)
+	}
+	_, err = io.Copy(stdout, stdoutIn)
+	if err != nil {
+		log.Fatalf("failed to capture stdout (%v)\n", err)
+	}
 
 	err = cmd.Wait()
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		log.Fatalf("cmd.Wait() failed with %s\n", err)
 	}
 
-	fmt.Println()
-	if errStdout != nil || errStderr != nil {
-		log.Fatalf("failed to capture stdout (%v) or stderr (%v)\n", errStdout, errStderr)
-	}
 	out = string(stdoutBuf.Bytes())
-	errStr := string(stderrBuf.Bytes())
-	if errStr != "" {
-		return out, errors.New(errStr)
-	}
+
+	fmt.Println()
 	return
 }
