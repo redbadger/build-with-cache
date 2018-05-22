@@ -11,6 +11,7 @@ func Test_parseDockerfile(t *testing.T) {
 	type args struct {
 		reader  io.Reader
 		imgName string
+		cache   string
 	}
 	tests := []struct {
 		name       string
@@ -30,7 +31,7 @@ FROM alpine as release
 
 COPY --from=builder /hello hello
 `),
-				"host.docker.internal:5000/redbadger/deploy:latest"},
+				"host.docker.internal:5000/redbadger/deploy:latest", ""},
 			[]string{"builder", "release"},
 			map[string]string{
 				"builder": "host.docker.internal:5000/redbadger/deploy-builder",
@@ -49,7 +50,7 @@ FROM alpine
 
 COPY --from=0 /hello hello
 `),
-				"host.docker.internal:5000/redbadger/deploy"},
+				"host.docker.internal:5000/redbadger/deploy", ""},
 			[]string{"0", "1"},
 			map[string]string{
 				"0": "host.docker.internal:5000/redbadger/deploy-0",
@@ -57,10 +58,29 @@ COPY --from=0 /hello hello
 			},
 			false,
 		},
+		{
+			"mixed naming with cache",
+			args{strings.NewReader(`
+FROM golang:alpine as builder
+
+RUN echo xx > /hello
+
+FROM alpine
+
+COPY --from=builder /hello hello
+`),
+				"host.docker.internal:5000/redbadger/deploy:latest", "localhost:5001"},
+			[]string{"builder", "1"},
+			map[string]string{
+				"builder": "localhost:5001/redbadger/deploy-builder",
+				"1":       "localhost:5001/redbadger/deploy-1",
+			},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotStages, gotImages, err := parseDockerfile(tt.args.reader, tt.args.imgName)
+			gotStages, gotImages, err := parseDockerfile(tt.args.reader, tt.args.imgName, tt.args.cache)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseDockerfile() error = %v, wantErr %v", err, tt.wantErr)
 				return
