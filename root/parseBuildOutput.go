@@ -21,9 +21,9 @@ func parseBuildOutput(buildOutput, imgName, cache string, stages []string) (imgN
 			if strings.HasPrefix(prev, " ---> ") {
 				sha := strings.Fields(prev)[1]
 				stage := stages[stageNum]
-				imgNamed := fmt.Sprintf("%s-%s", reference.TrimNamed(imgNamed), stage)
+				name := fmt.Sprintf("%s-%s", reference.TrimNamed(imgNamed), stage)
 				stageNum++
-				imgNames[sha] = imgNamed
+				imgNames[sha] = name
 			}
 		}
 		prev = s
