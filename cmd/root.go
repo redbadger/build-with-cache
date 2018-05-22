@@ -49,7 +49,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.build-with-cache.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "Dockerfile", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
 	rootCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Name and optionally a tag in the ‘registry/name:tag’ format")
-	rootCmd.PersistentFlags().StringVar(&cache, "cache", "c", "Optional registry to use for cache (e.g. myregistry.com:5000)")
+	rootCmd.PersistentFlags().StringVar(&cache, "cache", "", "Optional registry to use for cache (e.g. localhost:5000)")
 	rootCmd.PersistentFlags().StringVar(&flags, "flags", "", "Additional flags (as a string) to pass to docker build")
 }
 
