@@ -37,6 +37,9 @@ func Run(contextDir, file, imgName, cache, flags string) (err error) {
 			return
 		}
 		stages, images, err = parseDockerfile(reader, imgName, cache)
+		if err != nil {
+			return
+		}
 		for _, stage := range stages {
 			img := images[stage]
 			fmt.Printf("Pulling: %s\n", img)
