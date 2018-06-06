@@ -16,7 +16,6 @@ var (
 	file    string
 	tag     string
 	cache   string
-	flags   string
 )
 
 var rootCmd = &cobra.Command{
@@ -34,8 +33,11 @@ In order to use caching, a '--tag' must be specified, and be in a canonical form
 	Version: constants.Version,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = root.Run(args[0], file, tag, cache, flags)
+		err = root.Run(args[0], file, tag, cache)
 		return
+	},
+	FParseErrWhitelist: cobra.FParseErrWhitelist{
+		UnknownFlags: true,
 	},
 }
 
@@ -54,7 +56,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "Dockerfile", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
 	rootCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Name and optionally a tag in the ‘registry/name:tag’ format")
 	rootCmd.PersistentFlags().StringVar(&cache, "cache", "", "Optional registry to use for cache (e.g. localhost:5000)")
-	rootCmd.PersistentFlags().StringVar(&flags, "flags", "", "Additional flags (as a string) to pass to docker build")
 }
 
 func initConfig() {
