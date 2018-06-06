@@ -25,7 +25,11 @@ var rootCmd = &cobra.Command{
 	Long: `
 A cli command written in Go that uses a Docker registry to store layer caches in order to speed up build times. Useful in CI pipelines.
 
-The tool parses the Dockerfile for the stage targets and attempts to pull respective images from the specified registry. Any images it finds are used as layer caches for the docker build. Updated images for each stage back are pushed back to the registry ready for the next build.
+The tool parses the Dockerfile for the stage targets and attempts to pull respective images from the specified registry. Any images it finds are used as layer caches for the docker build. Updated images for each stage are pushed back to the registry ready for the next build.
+
+The usage is identical to 'docker build' except for the '--cache' flag.
+
+In order to use caching, a '--tag' must be specified, and be in a canonical form (e.g. example.com/repository)
 `,
 	Version: constants.Version,
 	Args:    cobra.ExactArgs(1),
