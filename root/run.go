@@ -20,7 +20,7 @@ func streamDockerMessages(dst io.Writer, src io.Reader) error {
 }
 
 // Run the root command
-func Run(contextDir, file, imgName, cache, flags string) (err error) {
+func Run(contextDir, file, imgName, cache string) (err error) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -37,6 +37,9 @@ func Run(contextDir, file, imgName, cache, flags string) (err error) {
 			return
 		}
 		stages, images, err = parseDockerfile(reader, imgName, cache)
+		if err != nil {
+			return
+		}
 		for _, stage := range stages {
 			img := images[stage]
 			fmt.Printf("Pulling: %s\n", img)
@@ -47,7 +50,7 @@ func Run(contextDir, file, imgName, cache, flags string) (err error) {
 		}
 	}
 
-	out, err := build(contextDir, file, imgName, flags, images)
+	out, err := build(contextDir, images)
 	if err != nil {
 		err = fmt.Errorf("Error running docker build: %s", err)
 		return

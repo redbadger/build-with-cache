@@ -16,7 +16,6 @@ var (
 	file    string
 	tag     string
 	cache   string
-	flags   string
 )
 
 var rootCmd = &cobra.Command{
@@ -25,13 +24,20 @@ var rootCmd = &cobra.Command{
 	Long: `
 A cli command written in Go that uses a Docker registry to store layer caches in order to speed up build times. Useful in CI pipelines.
 
-The tool parses the Dockerfile for the stage targets and attempts to pull respective images from the specified registry. Any images it finds are used as layer caches for the docker build. Updated images for each stage back are pushed back to the registry ready for the next build.
+The tool parses the Dockerfile for the stage targets and attempts to pull respective images from the specified registry. Any images it finds are used as layer caches for the docker build. Updated images for each stage are pushed back to the registry ready for the next build.
+
+The usage is identical to 'docker build' except for the '--cache' flag.
+
+In order to use caching, a '--tag' must be specified, and be in a canonical form (e.g. example.com/repository)
 `,
 	Version: constants.Version,
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		err = root.Run(args[0], file, tag, cache, flags)
+		err = root.Run(args[0], file, tag, cache)
 		return
+	},
+	FParseErrWhitelist: cobra.FParseErrWhitelist{
+		UnknownFlags: true,
 	},
 }
 
@@ -50,7 +56,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&file, "file", "f", "Dockerfile", "Name of the Dockerfile (Default is 'PATH/Dockerfile')")
 	rootCmd.PersistentFlags().StringVarP(&tag, "tag", "t", "", "Name and optionally a tag in the ‘registry/name:tag’ format")
 	rootCmd.PersistentFlags().StringVar(&cache, "cache", "", "Optional registry to use for cache (e.g. localhost:5000)")
-	rootCmd.PersistentFlags().StringVar(&flags, "flags", "", "Additional flags (as a string) to pass to docker build")
 }
 
 func initConfig() {

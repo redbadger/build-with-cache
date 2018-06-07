@@ -4,28 +4,43 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func build(dir, file, tag, flags string, images map[string]string) (out string, err error) {
+func createCommand(args []string) []string {
+	parts := []string{"docker", "build"}
+	skip := false
+	for _, x := range args {
+		if skip {
+			skip = false
+			continue
+		}
+		if x == "--cache" {
+			skip = true
+			continue
+		}
+		if strings.HasPrefix(x, "--cache=") {
+			continue
+		}
+		parts = append(parts, x)
+	}
+	return parts
+}
+
+func build(dir string, images map[string]string) (out string, err error) {
 	var stdoutBuf bytes.Buffer
 
-	args := []string{"build", dir, "-f", file}
-	if tag != "" {
-		args = append(args, "-t", tag)
-	}
+	args := createCommand(os.Args[1:])
 	for _, image := range images {
 		args = append(args, "--cache-from", image)
 	}
-	for _, field := range strings.Fields(flags) {
-		args = append(args, field)
-	}
 
-	fmt.Printf("\nCommand: docker %s\n", strings.Join(args, " "))
-	cmd := exec.Command("docker", args...)
+	log.WithField("command", strings.Join(args, " ")).Info("Executing")
+	cmd := exec.Command(args[0], args[1:]...)
 
 	cmd.Stderr = os.Stderr
 	if dir == "-" {
