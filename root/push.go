@@ -10,7 +10,7 @@ import (
 )
 
 func push(ctx context.Context, cli *client.Client, ref string) (err error) {
-	auth, err := makeAuthStr()
+	auth, err := getEncodedCredentials(ref)
 	if err != nil {
 		return errors.Wrap(err, "getting credentials")
 	}
