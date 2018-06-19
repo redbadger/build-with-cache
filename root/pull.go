@@ -10,7 +10,11 @@ import (
 )
 
 func pull(ctx context.Context, cli *client.Client, ref string) (err error) {
-	rc, err := cli.ImagePull(ctx, ref, types.ImagePullOptions{All: true})
+	auth, err := makeAuthStr()
+	if err != nil {
+		return errors.Wrap(err, "getting credentials")
+	}
+	rc, err := cli.ImagePull(ctx, ref, types.ImagePullOptions{All: true, RegistryAuth: auth})
 	if err != nil {
 		return errors.Wrap(err, "pulling image from repository")
 	}
