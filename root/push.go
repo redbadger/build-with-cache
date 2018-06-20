@@ -2,8 +2,6 @@ package root
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"os"
 
 	"github.com/docker/docker/api/types"
@@ -12,16 +10,11 @@ import (
 )
 
 func push(ctx context.Context, cli *client.Client, ref string) (err error) {
-	authConfig := types.AuthConfig{
-		Username: "admin",
-		Password: "admin123",
-	}
-	encodedJSON, err := json.Marshal(authConfig)
+	auth, err := getEncodedCredentials(ref)
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, "getting credentials")
 	}
-	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-	rc, err := cli.ImagePush(ctx, ref, types.ImagePushOptions{RegistryAuth: authStr})
+	rc, err := cli.ImagePush(ctx, ref, types.ImagePushOptions{RegistryAuth: auth})
 	if err != nil {
 		return errors.Wrap(err, "pushing image to repository")
 	}
